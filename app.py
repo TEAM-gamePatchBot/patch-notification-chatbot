@@ -1,7 +1,7 @@
 from flask import Flask, request
 import requests, json
 import common.scraping as scraping
-import os
+import os, boto3
 
 # with open("config.json", "r") as f:
 #    config = json.load(f)
@@ -33,6 +33,22 @@ def send_message(recipient_id, text):
 def get_bot_response(message):
     """This is just a dummy function, returning a variation of what
     the user said. Replace this function with one connected to chatbot."""
+    dynamodb = boto3.resource("dynamodb")
+    table = dynamodb.Table("kart")
+    print(table.creation_date_time)
+    table.put_item(
+        Item={
+            "notification_id": 1,
+            "date": "2010-12-31",
+            "last_name": "Doe",
+            "age": 25,
+            "account_type": "standard_user",
+        }
+    )
+
+    response = table.get_item(Key={"notification_id": 1, "date": "2010-12-31"})
+    item = response["Item"]
+    print(item)
 
     return "This is a dummy response to '{}'".format(message)
 
