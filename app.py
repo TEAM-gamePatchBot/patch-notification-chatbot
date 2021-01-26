@@ -1,15 +1,18 @@
 from flask import Flask, request
 import requests, json
 import common.scraping as scraping
+import os
 
 with open("config.json", "r") as f:
     config = json.load(f)
 
 app = Flask(__name__)
 FB_API_URL = "https://graph.facebook.com/v2.6/me/messages"
-VERIFY_TOKEN = config["TOKEN"]["VERIFY_TOKEN"]
-PAGE_ACCESS_TOKEN = config["TOKEN"]["PAGE_ACCESS_TOKEN"]
-scraping.kartScraping()
+# VERIFY_TOKEN = config["TOKEN"]["VERIFY_TOKEN"]
+# PAGE_ACCESS_TOKEN = config["TOKEN"]["PAGE_ACCESS_TOKEN"]
+
+VERIFY_TOKEN = os.environ["VERIFY_TOKEN"]
+PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 
 
 def send_message(recipient_id, text):
