@@ -3,8 +3,8 @@ import requests, json
 import common.scraping as scraping
 import os
 
-with open("config.json", "r") as f:
-    config = json.load(f)
+# with open("config.json", "r") as f:
+#    config = json.load(f)
 
 app = Flask(__name__)
 FB_API_URL = "https://graph.facebook.com/v2.6/me/messages"
