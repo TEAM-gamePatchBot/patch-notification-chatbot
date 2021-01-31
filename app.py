@@ -87,6 +87,28 @@ def talk():
     return "ok"
 
 
+@app.route("/notification", methods=["POST"])
+def notification():
+    data = request.get_json()
+    error = data["error"]
+    patchList = data["patchList"]
+
+    dynamodb = boto3.resource("dynamodb")
+    table = dynamodb.Table("gamePatchBot")
+
+    patchContents = list(
+        map(
+            lambda patchId: table.get_item(Key={"dataType": "kart", "notification_id": patchId})[
+                "Item"
+            ],
+            patchList,
+        )
+    )
+
+    for patch in patchContents:
+        print(patch)
+
+
 @app.route("/")
 def hello():
     return "hello"
