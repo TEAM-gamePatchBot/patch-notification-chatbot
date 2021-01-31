@@ -90,6 +90,7 @@ def talk():
 @app.route("/notification", methods=["POST"])
 def notification():
     data = request.get_json()
+    print(data)
     error = data["error"]
     patchList = data["patchList"]
 
