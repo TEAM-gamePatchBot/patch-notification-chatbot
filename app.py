@@ -37,7 +37,7 @@ def get_bot_response(sender, message):
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table("kart")
     table.put_item(
-        Item={"dataType": "customer", "notification_id": sender,}
+        Item={"dataType": "customer", "notification_id": int(sender),}
     )
 
     return "This is a dummy response to '{}'".format(message) + str(sender)
