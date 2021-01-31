@@ -106,8 +106,13 @@ def notification():
         )
     )
 
+    customerIdList = table.query(KeyConditionExpression=Key("dataType").eq("customer"))
+    print(customerIdList)
+
     for patch in patchContents:
-        print(patch)
+        send_message()
+
+    return "ok"
 
 
 @app.route("/")
