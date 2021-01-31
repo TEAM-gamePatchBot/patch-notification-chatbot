@@ -35,7 +35,7 @@ def get_bot_response(sender, message):
     the user said. Replace this function with one connected to chatbot."""
     print(sender)
     dynamodb = boto3.resource("dynamodb")
-    table = dynamodb.Table("kart")
+    table = dynamodb.Table("gamePatchBot")
     table.put_item(
         Item={"dataType": "customer", "notification_id": int(sender),}
     )
