@@ -33,6 +33,7 @@ def send_message(recipient_id, text):
 def get_bot_response(sender, message):
     """This is just a dummy function, returning a variation of what
     the user said. Replace this function with one connected to chatbot."""
+    print(sender)
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table("kart")
     table.put_item(
