@@ -14,9 +14,6 @@ FB_API_URL = "https://graph.facebook.com/v2.6/me/messages"
 VERIFY_TOKEN = os.environ["VERIFY_TOKEN"]
 PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 
-dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table("kart")
-
 
 def send_message(recipient_id, text):
     """Send a response to Facebook"""
@@ -36,8 +33,10 @@ def send_message(recipient_id, text):
 def get_bot_response(sender, message):
     """This is just a dummy function, returning a variation of what
     the user said. Replace this function with one connected to chatbot."""
+    dynamodb = boto3.resource("dynamodb")
+    table = dynamodb.Table("kart")
     table.put_item(
-        Item={"notification_id": sender, "dataType": "customer_id",}
+        Item={"dataType": "customer", "notification_id": sender,}
     )
 
     return "This is a dummy response to '{}'".format(message) + str(sender)
