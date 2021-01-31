@@ -17,6 +17,7 @@ PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("kart")
 
+
 def send_message(recipient_id, text):
     """Send a response to Facebook"""
     payload = {
@@ -32,17 +33,14 @@ def send_message(recipient_id, text):
     return response.json()
 
 
-def get_bot_response(sender,message):
+def get_bot_response(sender, message):
     """This is just a dummy function, returning a variation of what
     the user said. Replace this function with one connected to chatbot."""
     table.put_item(
-        Item={
-            "notification_id": sender,
-            "data_type": "customer_id",
-        }
+        Item={"notification_id": sender, "dataType": "customer_id",}
     )
 
-    return "This is a dummy response to '{}'".format(message)+str(sender)
+    return "This is a dummy response to '{}'".format(message) + str(sender)
 
 
 def verify_webhook(req):
