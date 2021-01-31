@@ -18,6 +18,7 @@ PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 
 def send_message(recipient_id, text):
     """Send a response to Facebook"""
+    print(recipient_id, text)
     payload = {
         "message": {"text": text},
         "recipient": {"id": recipient_id},
