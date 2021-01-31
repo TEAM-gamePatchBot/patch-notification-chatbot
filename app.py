@@ -107,13 +107,15 @@ def notification():
         )
     )
 
-    customerIdList = table.query(KeyConditionExpression=Key("dataType").eq("customer"))
-    print(customerIdList)
-
+    customerIdList = table.query(KeyConditionExpression=Key("dataType").eq("customer"))["Items"]
+    results = []
     for patch in patchContents:
-        send_message()
+        result = list(
+            map(lambda customer: send_message(customer[notification_id], patch), customerIdList)
+        )
+        results.append(result)
 
-    return "ok"
+    return results
 
 
 @app.route("/")
