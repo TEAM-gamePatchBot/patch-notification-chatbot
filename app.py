@@ -111,7 +111,7 @@ def notification():
     results = []
     for patch in patchContents:
         result = list(
-            map(lambda customer: send_message(customer[notification_id], patch), customerIdList)
+            map(lambda customer: send_message(customer["notification_id"], patch), customerIdList)
         )
         results.append(result)
 
