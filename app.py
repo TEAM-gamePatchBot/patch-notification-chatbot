@@ -108,6 +108,45 @@ def notification():
         )
     )
 
+    patchContents = list(
+        map(
+            lambda patch: "{}\n{}\n{}\n{}".format(
+                patch["subject"], patch["patchTime"], "content", patch["thumbnail_src"]
+            ),
+            patchContents,
+        )
+    )
+
+    # {
+    #     "subject": " 1/28(목) 업데이트 안내",
+    #     "content": {
+    #         "patch_list": [
+    #             {
+    #                 "patch_subject": "1. 시즌 패스 시즌 4가 오픈됩니다.",
+    #                 "patch_content": ["▶ 시즌 패스 시즌 4 오픈", "▶ 시즌 패스 시즌 4 관련 아이템 판매"],
+    #             },
+    #             {"patch_subject": "2. 스노우 모빌-R이 출시됩니다.", "patch_content": ["▶ 스노우 모빌-R이 판매됩니다."]},
+    #             {
+    #                 "patch_subject": "3. 다양한 이벤트가 진행됩니다.",
+    #                 "patch_content": ["▶ 겨울 맞이 아이템 복불복", "▶ 기다리면 열리는 상자가 오픈됩니다."],
+    #             },
+    #             {
+    #                 "patch_subject": "4. 다양한 퀘스트가 진행됩니다.",
+    #                 "patch_content": [
+    #                     "▶ 시즌  패스 시즌 4 OPEN (하루 한 번만 완료 가능)",
+    #                     "▶ 눈사람 요정 케로의 마법 (하루 한 번만 완료 가능)",
+    #                 ],
+    #             },
+    #             {"patch_subject": "5. 기타 시스템 변경사항", "patch_content": ["▶ 네이버 채널링 서비스 종료"]},
+    #         ]
+    #     },
+    #     "date": "2021-01-27",
+    #     "dataType": "kart",
+    #     "notification_id": Decimal("75190"),
+    #     "patchTime": "2021년 1월 28일(목) 오전 0시",
+    #     "thumbnail_src": "https://file.nexon.com/NxFile/Download/FileDownloader.aspx?oidFile=4908963554209564999",
+    # }
+
     customerIdList = table.query(KeyConditionExpression=Key("dataType").eq("customer"))["Items"]
     results = []
     for patch in patchContents:
