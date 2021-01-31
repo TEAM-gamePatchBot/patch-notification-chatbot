@@ -14,6 +14,8 @@ FB_API_URL = "https://graph.facebook.com/v2.6/me/messages"
 VERIFY_TOKEN = os.environ["VERIFY_TOKEN"]
 PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("kart")
 
 def send_message(recipient_id, text):
     """Send a response to Facebook"""
@@ -30,27 +32,17 @@ def send_message(recipient_id, text):
     return response.json()
 
 
-def get_bot_response(message):
+def get_bot_response(sender,message):
     """This is just a dummy function, returning a variation of what
     the user said. Replace this function with one connected to chatbot."""
-    dynamodb = boto3.resource("dynamodb")
-    table = dynamodb.Table("kart")
-    print(table.creation_date_time)
     table.put_item(
         Item={
-            "notification_id": 1,
-            "date": "2010-12-31",
-            "last_name": "Doe",
-            "age": 25,
-            "account_type": "standard_user",
+            "notification_id": sender,
+            "data_type": "customer_id",
         }
     )
 
-    response = table.get_item(Key={"notification_id": 1, "date": "2010-12-31"})
-    item = response["Item"]
-    print(item)
-
-    return "This is a dummy response to '{}'".format(message)
+    return "This is a dummy response to '{}'".format(message)+str(sender)
 
 
 def verify_webhook(req):
@@ -63,7 +55,7 @@ def verify_webhook(req):
 def respond(sender, message):
     """Formulate a response to the user and
     pass it on to a function that sends it."""
-    response = get_bot_response(message)
+    response = get_bot_response(sender, message)
     send_message(sender, response)
 
 
