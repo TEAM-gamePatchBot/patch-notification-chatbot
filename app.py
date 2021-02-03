@@ -161,6 +161,16 @@ def notification():
     return results
 
 
+@app.route("/army", methods=["POST"])
+def armyBot():
+    data = request.get_json()
+    print(data)
+    me = data["id"]
+    text = data["text"]
+    send_message(me, text)
+    return {"statusCode": 200}
+
+
 @app.route("/")
 def hello():
     return "hello"
