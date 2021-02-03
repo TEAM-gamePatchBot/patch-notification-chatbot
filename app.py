@@ -167,7 +167,19 @@ def armyBot():
     print(data)
     me = data["id"]
     text = data["text"]
-    send_message(me, text)
+    people = int(text.split(":")[0])
+    print(people)
+    if people < 10:
+        message = "지금 sw개발병의 경쟁률 {}으로 적은 편! 화이팅~".format(text)
+    elif people < 20:
+        message = "지금 sw개발병의 경쟁률 {}으로 쵸금 많은 편! 쫄지마 동진아!".format(text)
+    elif people < 30:
+        message = "지금 sw개발병의 경쟁률 {}으로 많은 편! 후...무섭다 무서워".format(text)
+    elif people < 40:
+        message = "지금 sw개발병의 경쟁률 {}으로 대박스! 마음을 좀 비워...".format(text)
+    elif people >= 40:
+        message = "지금 sw개발병의 경쟁률 {}으로 미쳐가는 중! 이건 뭐 실행될리가 없어~ㅋㅋ".format(text)
+    send_message(me, message)
     return {"statusCode": 200}
 
 
