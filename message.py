@@ -54,7 +54,7 @@ def make_text_from_data(data):
     patchContents = list(
         map(
             lambda patch: patch["patch_subject"] + "\n\t" + "\n\t".join(patch["patch_content"]),
-            data["patch_list"],
+            data["content"]["patch_list"],
         )
     )
     text += "\n".join(patchContents)
