@@ -90,6 +90,9 @@ def notification():
     error = data["error"]
     patchList = data["patchList"]
 
+    if len(patchList) == 0:
+        return
+
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table("gamePatchBot")
 
