@@ -292,9 +292,24 @@ class BaseMessenger(object):
     def get_user(self, fields=None, timeout=None):
         return self.client.get_user_data(self.get_user_id(), fields=fields, timeout=timeout)
 
-    def send(self, payload, messaging_type='RESPONSE', notification_type='REGULAR', timeout=None, tag=None, customer_id=self.get_user_id()):
-        return self.client.send(payload, customer_id, messaging_type=messaging_type,
-                                notification_type=notification_type, timeout=timeout, tag=tag)
+    def send(
+        self,
+        payload,
+        messaging_type="RESPONSE",
+        notification_type="REGULAR",
+        timeout=None,
+        tag=None,
+        customer_id=None,
+    ):
+        customer_id = self.get_user_id()
+        return self.client.send(
+            payload,
+            customer_id,
+            messaging_type=messaging_type,
+            notification_type=notification_type,
+            timeout=timeout,
+            tag=tag,
+        )
 
     def send_action(self, sender_action, timeout=None):
         return self.client.send_action(sender_action, self.get_user_id(), timeout=timeout)
