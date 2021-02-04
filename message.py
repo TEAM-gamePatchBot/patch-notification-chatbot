@@ -49,7 +49,7 @@ def get_recent_patch():
 def make_text_from_data(data):
     text = ""
     text += data["subject"] + "\n"
-    text += "업데이트 일정: " + data["patchTime"] + "\n"
+    text += "업데이트 일정: " + data["patchTime"] + "\n\n"
 
     patchContents = list(
         map(
@@ -57,7 +57,7 @@ def make_text_from_data(data):
             data["content"]["patch_list"],
         )
     )
-    text += "\n".join(patchContents)
+    text += "\n\n".join(patchContents)
     return text
 
 
