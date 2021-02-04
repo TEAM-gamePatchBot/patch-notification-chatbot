@@ -16,58 +16,6 @@ PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 messenger = message.Messenger(os.environ["PAGE_ACCESS_TOKEN"])
 
 
-def send_message(recipient_id, text):
-    """Send a response to Facebook"""
-    print(recipient_id, text)
-    payload = {
-        "message": {"text": text},
-        "recipient": {"id": recipient_id},
-        "notification_type": "regular",
-    }
-
-    auth = {"access_token": PAGE_ACCESS_TOKEN}
-
-    response = requests.post(FB_API_URL, params=auth, json=payload)
-
-    return response.json()
-
-
-def get_bot_response(sender, message):
-    """This is just a dummy function, returning a variation of what
-    the user said. Replace this function with one connected to chatbot."""
-    print(sender)
-    dynamodb = boto3.resource("dynamodb")
-    table = dynamodb.Table("gamePatchBot")
-    table.put_item(
-        Item={"dataType": "customer", "notification_id": int(sender),}
-    )
-
-    return "This is a dummy response to '{}'".format(message) + str(sender)
-
-
-def verify_webhook(req):
-    if req.args.get("hub.verify_token") == VERIFY_TOKEN:
-        return req.args.get("hub.challenge")
-    else:
-        return "incorrect"
-
-
-def respond(sender, message):
-    """Formulate a response to the user and
-    pass it on to a function that sends it."""
-    response = get_bot_response(sender, message)
-    send_message(sender, response)
-
-
-def is_user_message(message):
-    """Check if the message is a message from the user"""
-    return (
-        message.get("message")
-        and message["message"].get("text")
-        and not message["message"].get("is_echo")
-    )
-
-
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
     if request.method == "GET":
@@ -91,7 +39,7 @@ def notification():
     patchList = data["patchList"]
 
     if len(patchList) == 0:
-        return
+        return {}
 
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table("gamePatchBot")
@@ -105,14 +53,21 @@ def notification():
         )
     )
 
-    patchContents = list(
-        map(
-            lambda patch: "{}\n{}\n{}\n{}".format(
-                patch["subject"], patch["patchTime"], "content", patch["thumbnail_src"]
-            ),
-            patchContents,
+    def make_text_from_data(data):
+        text = ""
+        text += data["subject"] + "\n"
+        text += "업데이트 일정: " + data["patchTime"] + "\n\n"
+
+        patchContents = list(
+            map(
+                lambda patch: patch["patch_subject"] + "\n\t" + "\n\t".join(patch["patch_content"]),
+                data["content"]["patch_list"],
+            )
         )
-    )
+        text += "\n\n".join(patchContents)
+        return text
+
+    patchTexts = list(map(make_text_from_data, patchContents,))
 
     # {
     #     "subject": " 1/28(목) 업데이트 안내",
@@ -146,10 +101,12 @@ def notification():
 
     customerIdList = table.query(KeyConditionExpression=Key("dataType").eq("customer"))["Items"]
     results = []
-    for patch in patchContents:
+    for patch in patchTexts:
         result = list(
             map(
-                lambda customer: send_message(int(customer["notification_id"]), patch),
+                lambda customer: messenger.client.send(
+                    {"text": patch}, int(customer["notification_id"])
+                ),
                 customerIdList,
             )
         )
@@ -176,7 +133,7 @@ def armyBot():
         message = "지금 sw개발병의 경쟁률 {}으로 대박스! 마음을 좀 비워...".format(text)
     elif people >= 40:
         message = "지금 sw개발병의 경쟁률 {}으로 미쳐가는 중!".format(text)
-    send_message(me, message)
+    messenger.client.send({"text": message}, me)
     return {"statusCode": 200}
 
 
