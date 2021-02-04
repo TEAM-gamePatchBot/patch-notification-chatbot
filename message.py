@@ -51,6 +51,13 @@ def make_text_from_data(data):
     text += data["subject"] + "\n"
     text += "업데이트 일정: " + data["patchTime"] + "\n"
 
+    patchContents = list(
+        map(
+            lambda patch: patch["patch_subject"] + "\n\t" + "\n\t".join(patch["patch_content"]),
+            data["patch_list"],
+        )
+    )
+    text += "\n".join(patchContents)
     return text
 
 
@@ -69,7 +76,7 @@ def process_message(message):
             recentData = get_recent_patch()
             contents = make_text_from_data(recentData)
             response = Text(text=contents, quick_replies=qrs)
-        elif msg == "패치 내역 링크":
+        elif msg == "최근 패치 내역 링크":
             recentData = get_recent_patch()
             # DB에서 title, subtitle, image_url, item_url(게시글 id 만 가져오면 됨)
             elem = get_element(
