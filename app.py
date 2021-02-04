@@ -4,16 +4,16 @@ import common.scraping as scraping
 import os, boto3
 from boto3.dynamodb.conditions import Key
 
-# with open("config.json", "r") as f:
-#    config = json.load(f)
+import message
+
 
 app = Flask(__name__)
 FB_API_URL = "https://graph.facebook.com/v2.6/me/messages"
-# VERIFY_TOKEN = config["TOKEN"]["VERIFY_TOKEN"]
-# PAGE_ACCESS_TOKEN = config["TOKEN"]["PAGE_ACCESS_TOKEN"]
 
 VERIFY_TOKEN = os.environ["VERIFY_TOKEN"]
 PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
+
+messenger = message.Messenger(os.environ["PAGE_ACCESS_TOKEN"])
 
 
 def send_message(recipient_id, text):
@@ -68,25 +68,19 @@ def is_user_message(message):
     )
 
 
-@app.route("/webhook", methods=["GET"])
-def listen():
-    """This is the main function flask uses to
-    listen at the `/webhook` endpoint"""
+@app.route("/webhook", methods=["GET", "POST"])
+def webhook():
     if request.method == "GET":
-        return verify_webhook(request)
-
-
-@app.route("/webhook", methods=["POST"])
-def talk():
-    payload = request.get_json()
-    event = payload["entry"][0]["messaging"]
-    for x in event:
-        if is_user_message(x):
-            text = x["message"]["text"]
-            sender_id = x["sender"]["id"]
-            respond(sender_id, text)
-
-    return "ok"
+        if request.args.get("hub.verify_token") == VERIFY_TOKEN:
+            if request.args.get("init") and request.args.get("init") == "true":
+                messenger.init_bot()
+                return ""
+            return request.args.get("hub.challenge")
+        raise ValueError("FB_VERIFY_TOKEN does not match.")
+    elif request.method == "POST":
+        print(request.get_json(force=True))
+        messenger.handle(request.get_json(force=True))
+    return ""
 
 
 @app.route("/notification", methods=["POST"])
@@ -178,14 +172,14 @@ def armyBot():
     elif people < 40:
         message = "지금 sw개발병의 경쟁률 {}으로 대박스! 마음을 좀 비워...".format(text)
     elif people >= 40:
-        message = "지금 sw개발병의 경쟁률 {}으로 미쳐가는 중! 이건 뭐 실행될리가 없어~ㅋㅋ".format(text)
+        message = "지금 sw개발병의 경쟁률 {}으로 미쳐가는 중!".format(text)
     send_message(me, message)
     return {"statusCode": 200}
 
 
 @app.route("/")
 def hello():
-    return "hello"
+    return "running"
 
 
 if __name__ == "__main__":
