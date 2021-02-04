@@ -24,7 +24,7 @@ def get_element(title, subtitle, image_url, item_url):
 
 def make_qrs_set():
     qr1 = quick_replies.QuickReply(title="최신 패치 내역", payload="PATCH_LIST_PAYLOAD")
-    qr2 = quick_replies.QuickReply(title="패치 내역 링크", payload="PATCH_LINK_PAYLOAD")
+    qr2 = quick_replies.QuickReply(title="최신 패치 내역 링크", payload="PATCH_LINK_PAYLOAD")
     qr3 = quick_replies.QuickReply(title="기능 설명", payload="FUNC_DESC_PAYLOAD")
     return quick_replies.QuickReplies(quick_replies=[qr1, qr2, qr3])
 
@@ -76,7 +76,7 @@ def process_message(message):
             recentData = get_recent_patch()
             contents = make_text_from_data(recentData)
             response = Text(text=contents, quick_replies=qrs)
-        elif msg == "최근 패치 내역 링크":
+        elif msg == "최신 패치 내역 링크":
             recentData = get_recent_patch()
             # DB에서 title, subtitle, image_url, item_url(게시글 id 만 가져오면 됨)
             elem = get_element(
