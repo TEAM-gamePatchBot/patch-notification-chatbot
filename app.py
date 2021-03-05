@@ -1,9 +1,7 @@
 from flask import Flask, request
 import requests, json
-import common.scraping as scraping
 import os, boto3
 from boto3.dynamodb.conditions import Key
-
 import message
 
 
