@@ -16,8 +16,7 @@ messenger = message.Messenger(os.environ["PAGE_ACCESS_TOKEN"])
 
 @app.route("/privacypolicy")
 def privacy():
-    return render_template("privacy/privacypolicy.html")
-
+    return render_template("privacy.html")
 
 
 @app.route("/webhook", methods=["GET", "POST"])
