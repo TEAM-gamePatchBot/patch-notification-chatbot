@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import requests, json
 import os, boto3
 from boto3.dynamodb.conditions import Key
@@ -12,6 +12,12 @@ VERIFY_TOKEN = os.environ["VERIFY_TOKEN"]
 PAGE_ACCESS_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 
 messenger = message.Messenger(os.environ["PAGE_ACCESS_TOKEN"])
+
+
+@app.route("/privacypolicy")
+def privacy():
+    return render_template("privacy/privacypolicy.html")
+
 
 
 @app.route("/webhook", methods=["GET", "POST"])
