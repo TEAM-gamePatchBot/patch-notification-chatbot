@@ -34,7 +34,7 @@ def save_customer_data(sender, otn_token):
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table("gamePatchBot")
     table.put_item(
-        Item={"dataType": "customer", "notification_id": otn_token,}
+        Item={"dataType": "customer", "notification_id": int(otn_token),}
     )
 
 
@@ -88,7 +88,7 @@ def process_message(message):
             contents = "입력창 위의 버튼을 눌러\n⚡최신 패치 내역⚡을 보거나\n📢카트라이더 패치 안내 게시판📢으로 이동할 수 있습니다😍"
             response = Text(text=contents, quick_replies=qrs)
         elif msg == "알림 설정":
-            title="Notify me"
+            title="매주 목요일 알림을 받으세요!"
             payload="OTN_PAYLOAD"
             response = OneTimeNotifTemplate(title, payload)
         else:
@@ -140,6 +140,7 @@ class Messenger(BaseMessenger):
     def optin(self, message):
         sender = message['sender']['id']
         otn_token = message['optin']['one_time_notif_token']
+        print(otn_token)
         save_customer_data(sender, otn_token)
         action = process_optin(message)
         res = self.send(action, 'RESPONSE')
