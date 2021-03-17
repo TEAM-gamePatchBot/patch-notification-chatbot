@@ -1,7 +1,7 @@
 from boto3.dynamodb.conditions import Key
 import boto3
 from fbmessenger import BaseMessenger, MessengerClient
-from fbmessenger.templates import GenericTemplate
+from fbmessenger.templates import GenericTemplate, OneTimeNotifTemplate
 from fbmessenger.elements import Text, Button, Element
 from fbmessenger import quick_replies
 from fbmessenger.attachments import Image, Video
@@ -26,14 +26,15 @@ def make_qrs_set():
     qr1 = quick_replies.QuickReply(title="최신 패치 내역", payload="PATCH_LIST_PAYLOAD")
     qr2 = quick_replies.QuickReply(title="최신 패치 내역 링크", payload="PATCH_LINK_PAYLOAD")
     qr3 = quick_replies.QuickReply(title="기능 설명", payload="FUNC_DESC_PAYLOAD")
-    return quick_replies.QuickReplies(quick_replies=[qr1, qr2, qr3])
+    qr4 = quick_replies.QuickReply(title="알림 설정", payload="OTN_PAYLOAD")
+    return quick_replies.QuickReplies(quick_replies=[qr1, qr2, qr3, qr4])
 
 
-def save_customer_data(sender):
+def save_customer_data(sender, otn_token):
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table("gamePatchBot")
     table.put_item(
-        Item={"dataType": "customer", "notification_id": int(sender),}
+        Item={"dataType": "customer", "notification_id": otn_token,}
     )
 
 
@@ -66,9 +67,6 @@ def process_message(message):
 
     qrs = make_qrs_set()
 
-    sender = message["sender"]["id"]
-    save_customer_data(sender)
-
     if "text" in message["message"]:
         msg = message["message"]["text"]
         if msg == "최신 패치 내역":
@@ -89,9 +87,20 @@ def process_message(message):
         elif msg == "기능 설명":
             contents = "입력창 위의 버튼을 눌러\n⚡최신 패치 내역⚡을 보거나\n📢카트라이더 패치 안내 게시판📢으로 이동할 수 있습니다😍"
             response = Text(text=contents, quick_replies=qrs)
+        elif msg == "알림 설정":
+            title="Notify me"
+            payload="OTN_PAYLOAD"
+            response = OneTimeNotifTemplate(title, payload)
         else:
             contents = "버튼을 눌러 내용을 확인해주세요!😊"
             response = Text(text=contents, quick_replies=qrs)
+    return response.to_dict()
+
+
+def process_optin(message):
+    qrs = make_qrs_set()
+    contents = "감사합니다!"
+    response = Text(text=contents, quick_replies=qrs)
     return response.to_dict()
 
 
@@ -127,3 +136,11 @@ class Messenger(BaseMessenger):
         if "start" in payload:
             txt = "안녕하세요~!"
             self.send({"text": txt}, "RESPONSE")
+
+    def optin(self, message):
+        sender = message['sender']['id']
+        otn_token = message['optin']['one_time_notif_token']
+        save_customer_data(sender, otn_token)
+        action = process_optin(message)
+        res = self.send(action, 'RESPONSE')
+        app.logger.debug('Response: {}'.format(res))
